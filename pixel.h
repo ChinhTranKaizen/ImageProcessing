@@ -15,15 +15,14 @@ Ideas for expansion of this class:
 */
 class Pixel{
     private:
-        int red {0};
-        int green {0};
-        int blue {0};
+        uint8_t red {0};
+        uint8_t green {0};
+        uint8_t blue {0};
     public:
-        Pixel(int r, int g, int b): red {r}, green {g}, blue {b} {
-            std::cout << "constructor called" << std::endl;
-        };
+        Pixel(uint8_t r, uint8_t g, uint8_t b): red {r}, green {g}, blue {b} {};
+        Pixel() : red(0), green(0), blue(0) {};
         int *getPixel();
-        void setPixel(int r = 0, int g = 0, int b = 0);
+        void setPixel(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0);
         
 
 };

@@ -5,7 +5,7 @@ int* Pixel::getPixel (){
     return wholePixel;
 }
 
-void Pixel::setPixel( int r, int g, int b) {
+void Pixel::setPixel(uint8_t r, uint8_t g, uint8_t b) {
     red = r;
     green = g;
     blue = b;

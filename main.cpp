@@ -2,7 +2,7 @@
 #include "pixel.h"
 
 int main() {
-    Pixel rOnly {256, 0, 0};
+    Pixel rOnly {255, 0, 0};
 
     for (size_t i {0}; i < PIXEL_SIZE; i++) {
         std::cout << *(rOnly.getPixel()+i) << std::endl;
