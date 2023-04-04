@@ -1,6 +1,7 @@
 //bmp header struct
 #include <cstdint>
-
+#ifndef BMPHEADER_H
+#define BMPHEADER_H
 #pragma pack(push, 1)
 struct BMPHeader {
     uint16_t signature;         // signature "BM"
@@ -24,3 +25,4 @@ struct DIBHeader {
     uint32_t num_colors;        // number of colors in the color palette (0 for true-color images)
     uint32_t important_colors;  // number of important colors in the color palette (0 for all colors)
 };
+#endif
