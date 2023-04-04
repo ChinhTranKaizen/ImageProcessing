@@ -18,7 +18,7 @@ class Image {
         //read in bmp file:
         void readImage(std::string filename);
         bool saveImage(const std::string& outputPath);
-        // void adjustBrightness(int level);
+        void adjustBrightness(float level);
         // void adjustContrast(int level);
         // void resizeImage(int percentage);
         // void detectEdge();

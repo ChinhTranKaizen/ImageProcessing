@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
-
+#include <algorithm>
 void Image::readImage(std::string filename) {
     // read the file as binary (to avoid intepretation as characters)
     // and in input mode (to read data from file) in contrast to ios::out
@@ -104,4 +104,43 @@ bool Image::saveImage(const std::string& outputPath) {
     outputFile.close();
     return true;
 }
-        
+
+//Adjust brightness of a pixel by multiplying it with a constant (<1 to reduce brightness
+//>1 to increase brightness)
+void Image::adjustBrightness(float level) {
+    // lighten the color follows the advices from : https://stackoverflow.com/questions/141855/programmatically-lighten-a-color
+    int threshold {255}, m {0}, total {0};
+    double temp {0}, gray {0};
+    for (int y {this->dibheader.height-1};y>=0;--y) {
+        for (int x{0};x<dibheader.width;++x){
+            int new_red {image[y][x].getPixel()[0]};
+            int new_green {image[y][x].getPixel()[1]};
+            int new_blue {image[y][x].getPixel()[2]};
+            new_red = static_cast<int>(new_red*level);
+            new_green = static_cast<int>(new_green*level);
+            new_blue = static_cast<int>(new_blue*level);
+            image[y][x].setPixel(static_cast<uint8_t>(std::min(static_cast<int>(255),new_red)), static_cast<uint8_t>(std::min(static_cast<int>(255),new_green)), static_cast<uint8_t>(std::min(static_cast<int>(255),new_blue)));
+            // if (level < 1.0) {
+            //     new_red = static_cast<int>(new_red*level);
+            //     new_green = static_cast<int>(new_green*level);
+            //     new_blue = static_cast<int>(new_blue*level);
+            //     image[y][x].setPixel(static_cast<uint8_t>(std::min(static_cast<int>(255),new_red)), static_cast<uint8_t>(std::min(static_cast<int>(255),new_green)), static_cast<uint8_t>(std::min(static_cast<int>(255),new_blue)));
+            
+            // } else if (level >1.0) {
+            //     m = std::max(std::max(new_red, new_green), new_blue);
+            //     if (m<=threshold) {
+            //         image[y][x].setPixel(static_cast<uint8_t>(new_red),static_cast<uint8_t>(new_green),static_cast<uint8_t>(new_blue));
+            //     }
+            //     total = new_red + new_green + new_blue;
+            //     if(total >= 3*threshold) {
+            //         image[y][x].setPixel(static_cast<uint8_t>(threshold),static_cast<uint8_t>(threshold),static_cast<uint8_t>(threshold));
+            //     }
+            //     temp = (3.0*threshold-static_cast<double>(total))/(3.0*m-static_cast<double>(total));
+            //     gray = static_cast<double>(threshold) - temp * static_cast<double>(m);
+            //     image[y][x].setPixel(static_cast<uint8_t>(gray+temp*new_red),static_cast<uint8_t>(gray+temp*new_green),static_cast<uint8_t>(gray+temp*new_blue));
+            // }
+            
+            
+        }
+    }
+}

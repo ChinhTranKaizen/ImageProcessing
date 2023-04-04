@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #ifndef PIXEL_SIZE
 #define PIXEL_SIZE 3
 #endif
@@ -21,7 +22,7 @@ class Pixel{
     public:
         Pixel(uint8_t r, uint8_t g, uint8_t b): red {r}, green {g}, blue {b} {};
         Pixel() : red(0), green(0), blue(0) {};
-        int *getPixel();
+        std::vector<uint8_t> getPixel ();
         void setPixel(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0);
         
 

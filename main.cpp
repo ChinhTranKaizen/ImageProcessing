@@ -15,7 +15,7 @@ int main() {
     for (size_t i {0}; i < PIXEL_SIZE; i++) {
         
         
-        std::cout << *(snail.image[y][x].getPixel()+i) <<std::endl;
+        std::cout << (snail.image[y][x].getPixel()[i]) <<std::endl;
     }
 
     std::cout << "Image height in pixels is: "<< snail.imageHeight << std::endl;
@@ -29,7 +29,14 @@ int main() {
         std::cerr << "Error: Failed to save the image." << std::endl;
         return 1;
     }
-    ;
+
+    Image brighterSnail {snail};
+    Image darkerSnail {snail};
+    brighterSnail.adjustBrightness(1.1);
+    darkerSnail.adjustBrightness(0.9);
+    brighterSnail.saveImage(".\\brighterSnail.bmp");
+    darkerSnail.saveImage(".\\darkerSnail.bmp");
+
 
     return 0;
 }
