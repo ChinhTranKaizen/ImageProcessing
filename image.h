@@ -21,6 +21,7 @@ class Image {
         void adjustBrightness(float level);
         long int adjustContrast(double level);
         void resizeImage(int newWidth, int newHeight);
+        Pixel bilinearInterpolation(double x, double y);
         // void detectEdge();
         // void blurImage(int level); //gaussianBlur the image
 };

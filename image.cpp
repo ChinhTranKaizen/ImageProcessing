@@ -183,63 +183,51 @@ long int Image::adjustContrast(double level){
     }
 }
 
+Pixel Image::bilinearInterpolation(double x, double y) {
+    int x1 = static_cast<int>(x);
+    int y1 = static_cast<int>(y);
+    int x2 = x1 + 1;
+    int y2 = y1 + 1;
+
+    double dx = x - x1;
+    double dy = y - y1;
+
+    std::vector<uint8_t> p1 = image[y1][x1].getPixel();
+    std::vector<uint8_t> p2 = image[y1][x2].getPixel();
+    std::vector<uint8_t> p3 = image[y2][x1].getPixel();
+    std::vector<uint8_t> p4 = image[y2][x2].getPixel();
+
+    std::vector<uint8_t> result(3);
+    for (int i = 0; i < 3; ++i) {
+        double val = (1 - dx) * (1 - dy) * p1[i] +
+                     dx * (1 - dy) * p2[i] +
+                     (1 - dx) * dy * p3[i] +
+                     dx * dy * p4[i];
+        result[i] = static_cast<uint8_t>(std::min(std::max(val, 0.0), 255.0));
+    }
+
+    return Pixel(result[0], result[1], result[2]);
+}
+
 void Image::resizeImage(int newWidth, int newHeight) {
     //Resizing image using bilinear interpolation
 
-    // Create a new 2D vector of pixels for the resized image
-    std::vector<std::vector<Pixel>> resizedImage(newHeight, std::vector<Pixel>(newWidth));
+    std::vector<std::vector<Pixel>> newImage(newHeight, std::vector<Pixel>(newWidth));
+    double scaleX = static_cast<double>(dibheader.width) / newWidth;
+    double scaleY = static_cast<double>(dibheader.height) / newHeight;
 
-    // Calculate the scaling factor for the width and height
-    double xFactor = (double)this->dibheader.width / newWidth;
-    double yFactor = (double)this->dibheader.height / newHeight;
-
-    // Iterate over each pixel in the resized image
-    for (int y = 0; y < newHeight; y++) {
-        for (int x = 0; x < newWidth; x++) {
-            // Calculate the corresponding pixel coordinates in the original image
-            double origX = xFactor * x;
-            double origY = yFactor * y;
-
-            // Calculate the four nearest pixel coordinates in the original image
-            int left = floor(origX);
-            int right = ceil(origX);
-            int top = floor(origY);
-            int bottom = ceil(origY);
-
-            // Calculate the fractional distance between the original pixel coordinates and the nearest pixel coordinates
-            double xFraction = origX - left;
-            double yFraction = origY - top;
-
-            // Get the pixel data for the four nearest pixels
-            std::vector<uint8_t> topLeft = this->image[top][left].getPixel();
-            std::vector<uint8_t> topRight = this->image[top][right].getPixel();
-            std::vector<uint8_t> bottomLeft = this->image[bottom][left].getPixel();
-            std::vector<uint8_t> bottomRight = this->image[bottom][right].getPixel();
-
-            // Calculate the pixel data for the resized pixel using bilinear interpolation
-            std::vector<uint8_t> pixelData(3);
-            for (int i = 0; i < 3; i++) {
-                double topValue = (1 - xFraction) * topLeft[i] + xFraction * topRight[i];
-                double bottomValue = (1 - xFraction) * bottomLeft[i] + xFraction * bottomRight[i];
-                double finalValue = (1 - yFraction) * topValue + yFraction * bottomValue;
-                pixelData[i] = (uint8_t)finalValue;
-            }
-
-            // Set the pixel data for the resized pixel
-            Pixel resizedPixel(pixelData[0], pixelData[1], pixelData[2]);
-            resizedImage[y][x] = resizedPixel;
+    for (int y = 0; y < newHeight; ++y) {
+        for (int x = 0; x < newWidth; ++x) {
+            double srcX = std::min(x * scaleX, static_cast<double>(dibheader.width - 2));
+            double srcY = std::min(y * scaleY, static_cast<double>(dibheader.height - 2));
+            newImage[y][x] = bilinearInterpolation(srcX, srcY);
         }
     }
 
-    // Update the image width and height to the resized values
-    this->dibheader.width = newWidth;
-    this->dibheader.height = newHeight;
-
-    // Update the image pixel data to the resized values
-    this->image = resizedImage;
-
-    // Update the BMP file size and pixel array size in the BMP header
-    this->bmpheader.file_size = this->bmpheader.data_offset + this->dibheader.image_size;
-    this->dibheader.image_size = newWidth * newHeight * (this->dibheader.bits_per_pixel / 8);
-    this->bmpheader.data_offset = sizeof(BMPHeader) + sizeof(DIBHeader);
+    // Update the image data and the DIB header
+    image = newImage;
+    dibheader.width = newWidth;
+    dibheader.height = newHeight;
+    dibheader.image_size = newWidth * newHeight * dibheader.bits_per_pixel / 8;
+    bmpheader.file_size = dibheader.image_size + bmpheader.data_offset;
 }
