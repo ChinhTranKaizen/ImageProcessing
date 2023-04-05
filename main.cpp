@@ -43,5 +43,10 @@ int main() {
     moreContrastSnail.saveImage(".\\moreContrastSnail.bmp");
     lessContrastSnail.saveImage(".\\lessContrastSnail.bmp");
 
+    Image biggerSnail {snail};
+    biggerSnail.saveImage(".\\biggerSnail.bmp");
+    biggerSnail.resizeImage(512,512);
+    biggerSnail.saveImage(".\\biggerSnail.bmp");
+
     return 0;
 }

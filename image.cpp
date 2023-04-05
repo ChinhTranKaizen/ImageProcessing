@@ -210,10 +210,6 @@ void Image::resizeImage(int newWidth, int newHeight) {
             double xFraction = origX - left;
             double yFraction = origY - top;
 
-            // Calculate the fractional distance between the original pixel coordinates and the nearest pixel coordinates
-            double xFraction = origX - left;
-            double yFraction = origY - top;
-
             // Get the pixel data for the four nearest pixels
             std::vector<uint8_t> topLeft = this->image[top][left].getPixel();
             std::vector<uint8_t> topRight = this->image[top][right].getPixel();
