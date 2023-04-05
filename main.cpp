@@ -23,20 +23,25 @@ int main() {
 
     std::string outputPath = ".\\newsnail.bmp";
 
-    if (snail.saveImage(outputPath)) {
-        std::cout << "Image saved successfully to " << outputPath << std::endl;
-    } else {
-        std::cerr << "Error: Failed to save the image." << std::endl;
-        return 1;
-    }
+    // if (snail.saveImage(outputPath)) {
+    //     std::cout << "Image saved successfully to " << outputPath << std::endl;
+    // } else {
+    //     std::cerr << "Error: Failed to save the image." << std::endl;
+    // }
 
-    Image brighterSnail {snail};
-    Image darkerSnail {snail};
-    brighterSnail.adjustBrightness(1.1);
-    darkerSnail.adjustBrightness(0.9);
-    brighterSnail.saveImage(".\\brighterSnail.bmp");
-    darkerSnail.saveImage(".\\darkerSnail.bmp");
-
+    // Image brighterSnail {snail};
+    // Image darkerSnail {snail};
+    // brighterSnail.adjustBrightness(1.1);
+    // darkerSnail.adjustBrightness(0.9);
+    // brighterSnail.saveImage(".\\brighterSnail.bmp");
+    // darkerSnail.saveImage(".\\darkerSnail.bmp");
+    
+    Image moreContrastSnail {snail};
+    Image lessContrastSnail {snail};
+    std::cout << moreContrastSnail.adjustContrast(-0.5) <<std::endl;
+    std::cout << lessContrastSnail.adjustContrast(0.5)<<std::endl;
+    moreContrastSnail.saveImage(".\\moreContrastSnail.bmp");
+    lessContrastSnail.saveImage(".\\lessContrastSnail.bmp");
 
     return 0;
 }

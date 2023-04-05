@@ -7,6 +7,8 @@
 #include <string>
 #include <cstdint>
 #include <algorithm>
+#include <numeric>
+#include <cmath>
 void Image::readImage(std::string filename) {
     // read the file as binary (to avoid intepretation as characters)
     // and in input mode (to read data from file) in contrast to ios::out
@@ -143,4 +145,105 @@ void Image::adjustBrightness(float level) {
             
         }
     }
+}
+
+//Adjust the contrast of the image negative float number -> more contrast (brighter),
+// positive float number -> less contrast (darker)
+long int Image::adjustContrast(double level){
+    //Calculate the sum of all the values of all the pixels in an image:
+    long int sum {0};
+    for (int y {this->dibheader.height-1}; y>=0; --y){
+        for (int x {0}; x<this->dibheader.width; ++x) {
+            for (int temp : image[y][x].getPixel()) {
+                sum += temp;
+            }
+        }
+    }
+    // return sum;
+    //Calculate the average brightness
+    long double avgBrightness {static_cast<long double>(sum)/(this->dibheader.width*this->dibheader.height)};
+    //Adjust contrast for the picture
+    for (int y {this->dibheader.height-1}; y>=0; --y){
+        for (int x {0}; x<this->dibheader.width; ++x) {
+            int dr = image[y][x].getPixel()[0] - avgBrightness;
+            int dg = image[y][x].getPixel()[1] - avgBrightness;
+            int db = image[y][x].getPixel()[2] - avgBrightness;
+            int new_r = image[y][x].getPixel()[0] + static_cast<int>(dr * level);
+            int new_g = image[y][x].getPixel()[1] + static_cast<int>(dr * level);
+            int new_b = image[y][x].getPixel()[2] + static_cast<int>(dr * level);
+            new_r = (new_r > 255) ? 255:new_r;
+            new_g = (new_g > 255) ? 255:new_g;
+            new_b = (new_b > 255) ? 255:new_b;
+            new_r = (new_r <0) ? 0:new_r;
+            new_g = (new_g <0) ? 0:new_g;
+            new_b = (new_b <0) ? 0:new_b;
+            image[y][x].setPixel(static_cast<uint8_t>(new_r), static_cast<uint8_t>(new_g), static_cast<uint8_t>(new_b));
+            
+        }
+    }
+}
+
+void Image::resizeImage(int newWidth, int newHeight) {
+    //Resizing image using bilinear interpolation
+
+    // Create a new 2D vector of pixels for the resized image
+    std::vector<std::vector<Pixel>> resizedImage(newHeight, std::vector<Pixel>(newWidth));
+
+    // Calculate the scaling factor for the width and height
+    double xFactor = (double)this->dibheader.width / newWidth;
+    double yFactor = (double)this->dibheader.height / newHeight;
+
+    // Iterate over each pixel in the resized image
+    for (int y = 0; y < newHeight; y++) {
+        for (int x = 0; x < newWidth; x++) {
+            // Calculate the corresponding pixel coordinates in the original image
+            double origX = xFactor * x;
+            double origY = yFactor * y;
+
+            // Calculate the four nearest pixel coordinates in the original image
+            int left = floor(origX);
+            int right = ceil(origX);
+            int top = floor(origY);
+            int bottom = ceil(origY);
+
+            // Calculate the fractional distance between the original pixel coordinates and the nearest pixel coordinates
+            double xFraction = origX - left;
+            double yFraction = origY - top;
+
+            // Calculate the fractional distance between the original pixel coordinates and the nearest pixel coordinates
+            double xFraction = origX - left;
+            double yFraction = origY - top;
+
+            // Get the pixel data for the four nearest pixels
+            std::vector<uint8_t> topLeft = this->image[top][left].getPixel();
+            std::vector<uint8_t> topRight = this->image[top][right].getPixel();
+            std::vector<uint8_t> bottomLeft = this->image[bottom][left].getPixel();
+            std::vector<uint8_t> bottomRight = this->image[bottom][right].getPixel();
+
+            // Calculate the pixel data for the resized pixel using bilinear interpolation
+            std::vector<uint8_t> pixelData(3);
+            for (int i = 0; i < 3; i++) {
+                double topValue = (1 - xFraction) * topLeft[i] + xFraction * topRight[i];
+                double bottomValue = (1 - xFraction) * bottomLeft[i] + xFraction * bottomRight[i];
+                double finalValue = (1 - yFraction) * topValue + yFraction * bottomValue;
+                pixelData[i] = (uint8_t)finalValue;
+            }
+
+            // Set the pixel data for the resized pixel
+            Pixel resizedPixel(pixelData[0], pixelData[1], pixelData[2]);
+            resizedImage[y][x] = resizedPixel;
+        }
+    }
+
+    // Update the image width and height to the resized values
+    this->dibheader.width = newWidth;
+    this->dibheader.height = newHeight;
+
+    // Update the image pixel data to the resized values
+    this->image = resizedImage;
+
+    // Update the BMP file size and pixel array size in the BMP header
+    this->bmpheader.file_size = this->bmpheader.data_offset + this->dibheader.image_size;
+    this->dibheader.image_size = newWidth * newHeight * (this->dibheader.bits_per_pixel / 8);
+    this->bmpheader.data_offset = sizeof(BMPHeader) + sizeof(DIBHeader);
 }

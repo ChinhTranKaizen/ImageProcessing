@@ -19,8 +19,8 @@ class Image {
         void readImage(std::string filename);
         bool saveImage(const std::string& outputPath);
         void adjustBrightness(float level);
-        // void adjustContrast(int level);
-        // void resizeImage(int percentage);
+        long int adjustContrast(double level);
+        void resizeImage(int newWidth, int newHeight);
         // void detectEdge();
         // void blurImage(int level); //gaussianBlur the image
 };

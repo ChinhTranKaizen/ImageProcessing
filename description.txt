@@ -12,4 +12,4 @@ Here's one possible approach:
 
 5. Finally, write a simple command-line interface that allows the user to load an image, perform one or more operations on it, and save the resulting image to disk.
 
-This project should allow you to practice many of the core concepts of object-oriented programming in C++, including class definitions, method implementations, and the use of libraries for file input/output and image processing. Additionally, it should give you an opportunity to experiment with a range of image processing techniques and learn more about how they work.
+This project should allow you to practice many of the core concepts of object-oriented programming in C++, including class definitions, method implementations, and the use of libraries for file input/output and image processing. Additionally, it should give you an opportunity to experiment with a range of image processing techniques and learn more about how they work.z
