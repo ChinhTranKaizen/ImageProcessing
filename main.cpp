@@ -67,11 +67,11 @@ int main() {
     moreblurredSnail.saveImage(".\\moreblurredSnail.bmp");
 
     Image evenmoreblurredSnail {snail};
-    evenmoreblurredSnail.blurImage(5, 3.0);
+    evenmoreblurredSnail.blurImage(7, 3.0);
     evenmoreblurredSnail.saveImage(".\\evenmoreblurredSnail.bmp");
 
     Image mostblurredSnail {snail};
-    mostblurredSnail.blurImage(5, 4.0);
+    mostblurredSnail.blurImage(9, 4.0);
     mostblurredSnail.saveImage(".\\mostblurredSnail.bmp");
 
     Image greySnail {snail};
