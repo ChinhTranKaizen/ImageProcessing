@@ -48,7 +48,9 @@ g++ -std=c++14 -o ImageProcessing main.cpp
 
 ## Examples
 
-The repository includes a folder named `examples` that contains sample images, demonstrating the results of applying various image processing techniques to the same input image. The folder is organized by technique, with subfolders for brightness, contrast, resizing, blurring, greyscale, and color filters.
+![smaller snail](./Examples/resize/smallerSnail.bmp)
+
+The repository also includes a folder named `examples` that contains sample images, demonstrating the results of applying various image processing techniques to the same input image. The folder is organized by technique, with subfolders for brightness, contrast, resizing, blurring, greyscale, and color filters.
 
 ## Contributing
 
