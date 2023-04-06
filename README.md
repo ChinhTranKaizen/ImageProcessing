@@ -24,27 +24,27 @@ The project includes the following image processing techniques:
 
 1. Clone the repository:
 
-\`\`\`
+```
 git clone https://github.com/ChinhTranKaizen/ImageProcessing
-\`\`\`
+```
 
 2. Navigate to the project directory:
 
-\`\`\`
+```
 cd ImageProcessing
-\`\`\`
+```
 
 3. Compile the project:
 
-\`\`\`
+```
 g++ -std=c++14 -o ImageProcessing main.cpp
-\`\`\`
+```
 
 4. Run the executable:
 
-\`\`\`
+```
 ./ImageProcessing.exe
-\`\`\`
+```
 
 ## Examples
 
