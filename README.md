@@ -24,31 +24,31 @@ The project includes the following image processing techniques:
 
 1. Clone the repository:
 
-\`\`\`
+```
 git clone https://github.com/ChinhTranKaizen/ImageProcessing
-\`\`\`
+```
 
 2. Navigate to the project directory:
 
-\`\`\`
+```
 cd ImageProcessing
-\`\`\`
+```
 
 3. Compile the project:
 
-\`\`\`
+```
 g++ -std=c++14 -o ImageProcessing main.cpp
-\`\`\`
+```
 
 4. Run the executable:
 
-\`\`\`
+```
 ./ImageProcessing.exe
-\`\`\`
+```
 
 ## Examples
 
-The repository includes a folder named \`examples\` that contains sample images, demonstrating the results of applying various image processing techniques to the same input image. The folder is organized by technique, with subfolders for brightness, contrast, resizing, blurring, greyscale, and color filters.
+The repository includes a folder named `examples` that contains sample images, demonstrating the results of applying various image processing techniques to the same input image. The folder is organized by technique, with subfolders for brightness, contrast, resizing, blurring, greyscale, and color filters.
 
 ## Contributing
 
