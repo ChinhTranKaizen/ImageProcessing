@@ -53,7 +53,6 @@ g++ -std=c++14 -o ImageProcessing main.cpp
 ![smaller snail](./Examples/resize/smallerSnail.bmp)
 ![original snail](./snail.bmp)
 ![bigger snail](./Examples/resize/biggerSnail.bmp)
-![biggest snail](./Examples/resize/biggestSnail.bmp)
 
 2. Near sighted snails (Gaussian blur)
 
