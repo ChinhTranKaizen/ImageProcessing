@@ -70,7 +70,7 @@ g++ -std=c++14 -o ImageProcessing main.cpp
 
 ![Andy Warhol snail](./Examples/colorFilter/artsySnail1.bmp)
 ![Billy Warhol snail](./Examples/colorFilter/artsySnail2.bmp)
-![Cindy Warhol snail](./Examples/colorFilter/artsySnail3.bmp)
+![Cindy Warhol snail](./Examples/colorFilter/artsySnail5.bmp)
 
 The repository also includes a folder named `examples` that contains sample images, demonstrating the results of applying various image processing techniques to the same input image. The folder is organized by technique, with subfolders for brightness, contrast, resizing, blurring, greyscale, and color filters.
 
