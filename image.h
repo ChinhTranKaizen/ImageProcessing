@@ -8,6 +8,7 @@
 #define IMAGE_H
 
 class Image {
+    // private: 
     public:
         int imageWidth {1};
         int imageHeight {1};
@@ -19,11 +20,12 @@ class Image {
         void readImage(std::string filename);
         bool saveImage(const std::string& outputPath);
         void adjustBrightness(float level);
-        long int adjustContrast(double level);
+        void adjustContrast(double level);
         void resizeImage(int newWidth, int newHeight);
-        Pixel bilinearInterpolation(double x, double y);
-        // void detectEdge();
-        // void blurImage(int level); //gaussianBlur the image
+        void edgeDetection(double lowThreshold, double highThreshold);
+        void blurImage(int kernelSize, double sigma) ; //gaussianBlur the image
+    private:
+        std::vector<std::vector<double>> applyKernel(const std::vector<std::vector<double>>& kernel);
 };
 
 #endif

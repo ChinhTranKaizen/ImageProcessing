@@ -38,8 +38,8 @@ int main() {
     
     Image moreContrastSnail {snail};
     Image lessContrastSnail {snail};
-    std::cout << moreContrastSnail.adjustContrast(-0.5) <<std::endl;
-    std::cout << lessContrastSnail.adjustContrast(0.5)<<std::endl;
+    moreContrastSnail.adjustContrast(-0.1);
+    lessContrastSnail.adjustContrast(0.1);
     moreContrastSnail.saveImage(".\\moreContrastSnail.bmp");
     lessContrastSnail.saveImage(".\\lessContrastSnail.bmp");
 

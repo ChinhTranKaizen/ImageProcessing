@@ -149,7 +149,7 @@ void Image::adjustBrightness(float level) {
 
 //Adjust the contrast of the image negative float number -> more contrast (brighter),
 // positive float number -> less contrast (darker)
-long int Image::adjustContrast(double level){
+void Image::adjustContrast(double level){
     //Calculate the sum of all the values of all the pixels in an image:
     long int sum {0};
     for (int y {this->dibheader.height-1}; y>=0; --y){
@@ -183,29 +183,44 @@ long int Image::adjustContrast(double level){
     }
 }
 
-Pixel Image::bilinearInterpolation(double x, double y) {
+// The bilinearInterpolation function takes an image (2D vector of Pixel objects) and the floating-point
+// x and y coordinates as input, and returns the interpolated color at the given coordinates using
+// bilinear interpolation.
+Pixel bilinearInterpolation(std::vector<std::vector<Pixel>>& image, double x, double y) {
+    // Convert the floating-point coordinates x and y to integer coordinates.
     int x1 = static_cast<int>(x);
     int y1 = static_cast<int>(y);
+
+    // Calculate the next integer coordinates.
     int x2 = x1 + 1;
     int y2 = y1 + 1;
 
+    // Calculate the differences (dx and dy) between the floating-point and integer coordinates.
     double dx = x - x1;
     double dy = y - y1;
 
+    // Retrieve the pixel colors at the four surrounding integer coordinates.
     std::vector<uint8_t> p1 = image[y1][x1].getPixel();
     std::vector<uint8_t> p2 = image[y1][x2].getPixel();
     std::vector<uint8_t> p3 = image[y2][x1].getPixel();
     std::vector<uint8_t> p4 = image[y2][x2].getPixel();
 
+    // Create a vector to store the resulting interpolated color.
     std::vector<uint8_t> result(3);
+
+    // Loop through the color channels (R, G, and B).
     for (int i = 0; i < 3; ++i) {
+        // Perform bilinear interpolation for the current color channel.
         double val = (1 - dx) * (1 - dy) * p1[i] +
                      dx * (1 - dy) * p2[i] +
                      (1 - dx) * dy * p3[i] +
                      dx * dy * p4[i];
+
+        // Clamp the resulting value to the range [0, 255] and store it in the result vector.
         result[i] = static_cast<uint8_t>(std::min(std::max(val, 0.0), 255.0));
     }
 
+    // Return the interpolated color as a Pixel object.
     return Pixel(result[0], result[1], result[2]);
 }
 
@@ -220,7 +235,7 @@ void Image::resizeImage(int newWidth, int newHeight) {
         for (int x = 0; x < newWidth; ++x) {
             double srcX = std::min(x * scaleX, static_cast<double>(dibheader.width - 2));
             double srcY = std::min(y * scaleY, static_cast<double>(dibheader.height - 2));
-            newImage[y][x] = bilinearInterpolation(srcX, srcY);
+            newImage[y][x] = bilinearInterpolation(image, srcX, srcY);
         }
     }
 
@@ -231,3 +246,67 @@ void Image::resizeImage(int newWidth, int newHeight) {
     dibheader.image_size = newWidth * newHeight * dibheader.bits_per_pixel / 8;
     bmpheader.file_size = dibheader.image_size + bmpheader.data_offset;
 }
+
+// Helper function to generate a Gaussian kernel
+std::vector<std::vector<double>> generateGaussianKernel(int kernelSize, double sigma) {
+    std::vector<std::vector<double>> kernel(kernelSize, std::vector<double>(kernelSize));
+    double twoSigmaSquared = 2 * sigma * sigma;
+    double sum = 0.0;
+
+    int halfKernelSize = kernelSize / 2;
+
+    for (int y = -halfKernelSize; y <= halfKernelSize; ++y) {
+        for (int x = -halfKernelSize; x <= halfKernelSize; ++x) {
+            double g = std::exp(-(x * x + y * y) / twoSigmaSquared) / (M_PI * twoSigmaSquared);
+            kernel[y + halfKernelSize][x + halfKernelSize] = g;
+            sum += g;
+        }
+    }
+
+    // Normalize the kernel
+    for (int y = 0; y < kernelSize; ++y) {
+        for (int x = 0; x < kernelSize; ++x) {
+            kernel[y][x] /= sum;
+        }
+    }
+
+    return kernel;
+}
+
+void Image::blurImage(int kernelSize, double sigma) {
+    std::vector<std::vector<double>> kernel = generateGaussianKernel(kernelSize, sigma);
+    std::vector<std::vector<Pixel>> newImage(dibheader.height, std::vector<Pixel>(dibheader.width));
+
+    int halfKernelSize = kernelSize / 2;
+
+    for (int y = 0; y < dibheader.height; ++y) {
+        for (int x = 0; x < dibheader.width; ++x) {
+            double rSum = 0.0;
+            double gSum = 0.0;
+            double bSum = 0.0;
+
+            for (int ky = -halfKernelSize; ky <= halfKernelSize; ++ky) {
+                for (int kx = -halfKernelSize; kx <= halfKernelSize; ++kx) {
+                    int ny = y + ky;
+                    int nx = x + kx;
+
+                    if (ny >= 0 && ny < dibheader.height && nx >= 0 && nx < dibheader.width) {
+                        std::vector<uint8_t> pixel = image[ny][nx].getPixel();
+                        double kernelVal = kernel[ky + halfKernelSize][kx + halfKernelSize];
+
+                        rSum += pixel[0] * kernelVal;
+                        gSum += pixel[1] * kernelVal;
+                        bSum += pixel[2] * kernelVal;
+                    }
+                }
+            }
+
+            newImage[y][x] = Pixel(static_cast<uint8_t>(std::min(std::max(rSum, 0.0), 255.0)),
+                                   static_cast<uint8_t>(std::min(std::max(gSum, 0.0), 255.0)),
+                                   static_cast<uint8_t>(std::min(std::max(bSum, 0.0), 255.0)));
+        }
+    }
+
+    image = newImage;
+}
+
