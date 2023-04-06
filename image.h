@@ -24,8 +24,10 @@ class Image {
         void resizeImage(int newWidth, int newHeight);
         void edgeDetection(double lowThreshold, double highThreshold);
         void blurImage(int kernelSize, double sigma) ; //gaussianBlur the image
+        void toGrayscale();
     private:
         std::vector<std::vector<double>> applyKernel(const std::vector<std::vector<double>>& kernel);
+        std::vector<std::vector<double>> blurGrayscale(const std::vector<std::vector<double>>& input, int kernelSize, double sigma);
 };
 
 #endif

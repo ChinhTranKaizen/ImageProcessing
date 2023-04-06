@@ -47,9 +47,18 @@ int main() {
     biggerSnail.resizeImage(512,512);
     biggerSnail.saveImage(".\\biggerSnail.bmp");
 
+    Image smallerSnail {snail};
+    smallerSnail.resizeImage(128,128);
+    smallerSnail.saveImage(".\\smallerSnail.bmp");
+
     Image blurredSnail {snail};
     blurredSnail.blurImage(5, 1.2);
     blurredSnail.saveImage(".\\blurredSnail.bmp");
 
+    Image greySnail {snail};
+    greySnail.toGrayscale();
+    greySnail.saveImage(".\\greySnail.bmp");
+
     return 0;
 }
+

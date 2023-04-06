@@ -310,3 +310,44 @@ void Image::blurImage(int kernelSize, double sigma) {
     image = newImage;
 }
 
+// Helper function to apply a kernel to the image (convolution operation)
+std::vector<std::vector<double>> Image::applyKernel(const std::vector<std::vector<double>>& kernel) {
+    int kernelSize = kernel.size();
+    int kernelCenter = kernelSize / 2;
+    std::vector<std::vector<double>> result(dibheader.height, std::vector<double>(dibheader.width));
+
+    for (int y = 0; y < dibheader.height; ++y) {
+        for (int x = 0; x < dibheader.width; ++x) {
+            double sum = 0.0;
+
+            for (int ky = -kernelCenter; ky <= kernelCenter; ++ky) {
+                for (int kx = -kernelCenter; kx <= kernelCenter; ++kx) {
+                    int imgY = std::min(std::max(y + ky, 0), dibheader.height - 1);
+                    int imgX = std::min(std::max(x + kx, 0), dibheader.width - 1);
+                    std::vector<uint8_t> color = image[imgY][imgX].getPixel();
+                    double gray = 0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2];
+                    sum += gray * kernel[ky + kernelCenter][kx + kernelCenter];
+                }
+            }
+
+            result[y][x] = sum;
+        }
+    }
+
+    return result;
+}
+
+void Image::toGrayscale() {
+    std::vector<std::vector<Pixel>> grayscale(dibheader.height, std::vector<Pixel>(dibheader.width));
+
+    for (int y = 0; y < dibheader.height; ++y) {
+        for (int x = 0; x < dibheader.width; ++x) {
+            std::vector<uint8_t> color = image[y][x].getPixel();
+            uint8_t grayValue = static_cast<uint8_t>(0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2]);
+            grayscale[y][x] = Pixel(grayValue, grayValue, grayValue);
+        }
+    }
+
+    image = grayscale;
+}
+
