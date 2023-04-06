@@ -47,8 +47,24 @@ g++ -std=c++14 -o ImageProcessing main.cpp
 ```
 
 ## Examples
-
+1. Snail brothers (resizing)
+![smallest snail](./Examples/resize/smallestSnail.bmp)
 ![smaller snail](./Examples/resize/smallerSnail.bmp)
+![original snail](./snail.bmp)
+![bigger snail](./Examples/resize/biggerSnail.bmp)
+![biggest snail](./Examples/resize/biggestSnail.bmp)
+2. Near sighted snails (Gaussian blur)
+![original snail](./snail.bmp)
+![blurred snail](./Examples/blurring/blurredSnail.bmp)
+![more blurred snail](./Examples/blurring/moreblurredSnail.bmp)
+![even more blurred snail](./Examples/blurring/evenmoreblurredSnail.bmp)
+![most blurred snail](./Examples/blurring/mostblurredSnail.bmp)
+3. Grey snail (to greyscale)
+![grey snail](./Examples/greyscale/greySnail.bmp)
+4. Artsy snail (color filter)
+![Andy Warhol snail](./Examples/colorFilter/artsySnail1.bmp)
+![Billy Warhol snail](./Examples/colorFilter/artsySnail2.bmp)
+![Cindy Warhol snail](./Examples/colorFilter/artsySnail3.bmp)
 
 The repository also includes a folder named `examples` that contains sample images, demonstrating the results of applying various image processing techniques to the same input image. The folder is organized by technique, with subfolders for brightness, contrast, resizing, blurring, greyscale, and color filters.
 
