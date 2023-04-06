@@ -10,8 +10,6 @@
 class Image {
     // private: 
     public:
-        int imageWidth {1};
-        int imageHeight {1};
         BMPHeader bmpheader{};
         DIBHeader dibheader{};
         std::vector<std::vector<Pixel>> image;
@@ -22,12 +20,11 @@ class Image {
         void adjustBrightness(float level);
         void adjustContrast(double level);
         void resizeImage(int newWidth, int newHeight);
-        void edgeDetection(double lowThreshold, double highThreshold);
         void blurImage(int kernelSize, double sigma) ; //gaussianBlur the image
         void toGrayscale();
+        void applyColorFilter(double redScale, double greenScale, double blueScale);
     private:
         std::vector<std::vector<double>> applyKernel(const std::vector<std::vector<double>>& kernel);
-        std::vector<std::vector<double>> blurGrayscale(const std::vector<std::vector<double>>& input, int kernelSize, double sigma);
 };
 
 #endif

@@ -35,9 +35,7 @@ void Image::readImage(std::string filename) {
     this->dibheader = DIBheader;
 
     int32_t width = DIBheader.width;
-    this->imageWidth = DIBheader.width;
     int32_t height = DIBheader.height;
-    this->imageHeight = DIBheader.height;
     uint16_t bitsPerPixel = DIBheader.bits_per_pixel;
 
     // Calculate row padding
@@ -349,5 +347,19 @@ void Image::toGrayscale() {
     }
 
     image = grayscale;
+}
+
+void Image::applyColorFilter(double redScale, double greenScale, double blueScale)
+{
+    // Iterate over each pixel in the image and adjust its RGB values
+    for (int y = 0; y < dibheader.height; y++) {
+        for (int x = 0; x < dibheader.width; x++) {
+            const auto& pixel = image[y][x].getPixel();
+            uint8_t r = std::min(static_cast<uint8_t>(pixel[2] * redScale), static_cast<uint8_t>(255));
+            uint8_t g = std::min(static_cast<uint8_t>(pixel[1] * greenScale), static_cast<uint8_t>(255));
+            uint8_t b = std::min(static_cast<uint8_t>(pixel[0] * blueScale), static_cast<uint8_t>(255));
+            image[y][x].setPixel(r, g, b);
+        }
+    }
 }
 
