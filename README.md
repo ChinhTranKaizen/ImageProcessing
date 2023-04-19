@@ -76,7 +76,7 @@ The repository also includes a folder named `examples` that contains sample imag
 
 ## Contributing
 
-While this is a personal project, I welcome any feedback or suggestions for improvement. Please feel free to open an issue or submit a pull request.
+While this is a personal project, I welcome any feedback or suggestions for improvement.
 
 ## License
 
