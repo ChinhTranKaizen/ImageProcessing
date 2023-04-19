@@ -3,6 +3,62 @@
 #include "image.h"
 #include <vector>
 #include <string>
+#include <cassert>
+
+void test_black_image() {
+    Image img;
+    img.image = std::vector<std::vector<Pixel>>(5, std::vector<Pixel>(5, Pixel(0, 0, 0)));
+
+    auto gradient_magnitude = img.sobelOperator();
+
+    for (const auto &row : gradient_magnitude) {
+        for (double value : row) {
+            assert(value == 0);
+        }
+    }
+}
+
+void test_white_image() {
+    Image img;
+    img.image = std::vector<std::vector<Pixel>>(5, std::vector<Pixel>(5, Pixel(255, 255, 255)));
+
+    auto gradient_magnitude = img.sobelOperator();
+
+    for (const auto &row : gradient_magnitude) {
+        for (double value : row) {
+            assert(value == 0);
+        }
+    }
+}
+
+void test_vertical_line() {
+    Image img;
+    img.image = std::vector<std::vector<Pixel>>(5, std::vector<Pixel>(5, Pixel(0, 0, 0)));
+
+    for (size_t i = 0; i < img.image.size(); ++i) {
+        img.image[i][2] = Pixel(255, 255, 255);
+    }
+
+    auto gradient_magnitude = img.sobelOperator();
+
+    for (size_t i = 0; i < gradient_magnitude.size(); ++i) {
+        for (size_t j = 0; j < gradient_magnitude[i].size(); ++j) {
+            if (j == 2) {
+                assert(gradient_magnitude[i][j] >= 255 * sqrt(2));
+            } else {
+                assert(gradient_magnitude[i][j] == 0);
+            }
+        }
+    }
+}
+
+void test_horizontal_line() {
+    // Implement this test case similarly to the vertical line test.
+}
+
+void test_diagonal_line() {
+    // Implement this test case similarly to the vertical line test.
+}
 
 int main() {
 
@@ -86,21 +142,11 @@ int main() {
     artsySnail2.applyColorFilter(1.0, 1.0, 1.3);
     artsySnail2.saveImage(".\\artsySnail2.bmp");
     
-    // Image artsySnail3 {snail};
-    // artsySnail3.applyColorFilter(0.7, 1.3, 1.0); //(1.0, 1.3, 1.0)
-    // artsySnail3.saveImage(".\\artsySnail3.bmp");
-
-    // Image artsySnail4 {snail};
-    // artsySnail4.applyColorFilter(1.3, 1.3, 1.0);
-    // artsySnail4.saveImage(".\\artsySnail4.bmp");
-
     Image artsySnail5 {snail};
     artsySnail5.applyColorFilter(1.3, 0.7, 0.0);
     artsySnail5.saveImage(".\\artsySnail5.bmp");
 
-    // Image artsySnail6 {snail};
-    // artsySnail6.applyColorFilter(0.7, 1.3, 1.3);
-    // artsySnail6.saveImage(".\\artsySnail6.bmp");
+
 
     return 0;
 }

@@ -410,3 +410,107 @@ std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>> Im
 
     return {gradient_x, gradient_y};
 }
+
+
+void Image::nonMaximumSuppression(std::vector<std::vector<double>>& gradient_magnitude, std::vector<std::vector<double>>& gradient_direction) {
+    int width = gradient_magnitude[0].size();
+    int height = gradient_magnitude.size();
+
+    std::vector<std::vector<double>> suppressed_magnitude(height, std::vector<double>(width, 0));
+
+    for (int y = 1; y < height - 1; y++) {
+        for (int x = 1; x < width - 1; x++) {
+            double direction = gradient_direction[y][x];
+            direction = fmod((direction + 180), 180);
+
+            double q = 0, r = 0;
+
+            if ((direction >= 0 && direction < 22.5) || (direction >= 157.5 && direction <= 180)) {
+                q = gradient_magnitude[y][x - 1];
+                r = gradient_magnitude[y][x + 1];
+            } else if (direction >= 22.5 && direction < 67.5) {
+                q = gradient_magnitude[y - 1][x + 1];
+                r = gradient_magnitude[y + 1][x - 1];
+            } else if (direction >= 67.5 && direction < 112.5) {
+                q = gradient_magnitude[y - 1][x];
+                r = gradient_magnitude[y + 1][x];
+            } else if (direction >= 112.5 && direction < 157.5) {
+                q = gradient_magnitude[y - 1][x - 1];
+                r = gradient_magnitude[y + 1][x + 1];
+            }
+
+            if (gradient_magnitude[y][x] >= q && gradient_magnitude[y][x] >= r) {
+                suppressed_magnitude[y][x] = gradient_magnitude[y][x];
+            } else {
+                suppressed_magnitude[y][x] = 0;
+            }
+        }
+    }
+
+    gradient_magnitude = suppressed_magnitude;
+}
+
+void Image::thresholding(std::vector<std::vector<double>>& gradient_magnitude, double lowerThreshold, double upperThreshold) {
+    // Create a copy of the gradient_magnitude matrix to store the result
+    std::vector<std::vector<double>> result(gradient_magnitude.size(), std::vector<double>(gradient_magnitude[0].size(), 0));
+
+    // Iterate over each pixel in the gradient_magnitude matrix
+    for (size_t i = 0; i < gradient_magnitude.size(); ++i) {
+        for (size_t j = 0; j < gradient_magnitude[i].size(); ++j) {
+            // Apply the threshold
+            if (gradient_magnitude[i][j] >= upperThreshold) {
+                result[i][j] = gradient_magnitude[i][j];
+                // Perform edge tracing
+                auto edgeTracing = [&](int x, int y, double threshold) -> bool {
+                    if (x < 0 || y < 0 || x >= static_cast<int>(gradient_magnitude.size()) || y >= static_cast<int>(gradient_magnitude[0].size())) {
+                        return false;
+                    }
+
+                    if (result[x][y] != 0) {
+                        return true;
+                    }
+
+                    if (gradient_magnitude[x][y] >= threshold) {
+                        result[x][y] = gradient_magnitude[x][y];
+                        return true;
+                    }
+
+                    return false;
+                };
+
+                for (int dx = -1; dx <= 1; ++dx) {
+                    for (int dy = -1; dy <= 1; ++dy) {
+                        if (dx == 0 && dy == 0) {
+                            continue;
+                        }
+                        edgeTracing(i + dx, j + dy, lowerThreshold);
+                    }
+                }
+            }
+        }
+    }
+
+    gradient_magnitude.swap(result);
+}
+
+void Image::hysteresis(std::vector<std::vector<double>>& gradient_magnitude, int x, int y, double lowerThreshold) {
+    int width = gradient_magnitude[0].size();
+    int height = gradient_magnitude.size();
+
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+        return;
+    }
+
+    if (gradient_magnitude[y][x] >= lowerThreshold) {
+        gradient_magnitude[y][x] = 255;
+
+        // Iterate through the 8 neighboring pixels
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                if (dy != 0 || dx != 0) {
+                    hysteresis(gradient_magnitude, x + dx, y + dy, lowerThreshold);
+                }
+            }
+        }
+    }
+}

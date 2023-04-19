@@ -13,7 +13,6 @@ class Image {
         BMPHeader bmpheader{};
         DIBHeader dibheader{};
         std::vector<std::vector<Pixel>> image;
-    // public:
         //read in bmp file:
         void readImage(std::string filename);
         bool saveImage(const std::string& outputPath);
@@ -24,7 +23,7 @@ class Image {
         void toGrayscale();
         void applyColorFilter(double redScale, double greenScale, double blueScale);
         void cannyEdgeDetection(double lowerThreshold, double upperThreshold, int kernelSize, double sigma); 
-    private:
+    // private:
         //helper functions for canny edge detector:
         std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>> sobelOperator();
         void nonMaximumSuppression(std::vector<std::vector<double>>& gradient_magnitude, std::vector<std::vector<double>>& gradient_direction);
