@@ -308,32 +308,6 @@ void Image::blurImage(int kernelSize, double sigma) {
     image = newImage;
 }
 
-// Helper function to apply a kernel to the image (convolution operation)
-std::vector<std::vector<double>> Image::applyKernel(const std::vector<std::vector<double>>& kernel) {
-    int kernelSize = kernel.size();
-    int kernelCenter = kernelSize / 2;
-    std::vector<std::vector<double>> result(dibheader.height, std::vector<double>(dibheader.width));
-
-    for (int y = 0; y < dibheader.height; ++y) {
-        for (int x = 0; x < dibheader.width; ++x) {
-            double sum = 0.0;
-
-            for (int ky = -kernelCenter; ky <= kernelCenter; ++ky) {
-                for (int kx = -kernelCenter; kx <= kernelCenter; ++kx) {
-                    int imgY = std::min(std::max(y + ky, 0), dibheader.height - 1);
-                    int imgX = std::min(std::max(x + kx, 0), dibheader.width - 1);
-                    std::vector<uint8_t> color = image[imgY][imgX].getPixel();
-                    double gray = 0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2];
-                    sum += gray * kernel[ky + kernelCenter][kx + kernelCenter];
-                }
-            }
-
-            result[y][x] = sum;
-        }
-    }
-
-    return result;
-}
 
 void Image::toGrayscale() {
     std::vector<std::vector<Pixel>> grayscale(dibheader.height, std::vector<Pixel>(dibheader.width));
@@ -363,3 +337,76 @@ void Image::applyColorFilter(double redScale, double greenScale, double blueScal
     }
 }
 
+// Canny Edge Detection method
+void Image::cannyEdgeDetection(double lowerThreshold, double upperThreshold, int kernelSize, double sigma) {
+    // Step 1: Convert image to grayscale
+    this->toGrayscale();
+
+    // Step 2: Apply Gaussian blur
+    this->blurImage(kernelSize, sigma);
+
+    // Step 3: Calculate the gradient magnitude and direction using the Sobel operator
+    auto sobelResults = sobelOperator();
+    auto& gradient_magnitude = sobelResults.first;
+    auto& gradient_direction = sobelResults.second;
+
+    // Step 4: Apply non-maximum suppression
+    nonMaximumSuppression(gradient_magnitude, gradient_direction);
+
+    // Step 5: Perform double thresholding
+    thresholding(gradient_magnitude, lowerThreshold, upperThreshold);
+
+    // Step 6: Trace edges using hysteresis
+    for (int y = 0; y < image.size(); y++) {
+        for (int x = 0; x < image[y].size(); x++) {
+            if (gradient_magnitude[y][x] == upperThreshold) {
+                hysteresis(gradient_magnitude, x, y, lowerThreshold);
+            }
+        }
+    }
+
+    // Convert the gradient magnitude to pixel values
+    for (int y = 0; y < image.size(); y++) {
+        for (int x = 0; x < image[y].size(); x++) {
+            image[y][x].setPixel(
+                static_cast<uint8_t>(gradient_magnitude[y][x]),
+                static_cast<uint8_t>(gradient_magnitude[y][x]),
+                static_cast<uint8_t>(gradient_magnitude[y][x]));
+            // image[y][x].red = image[y][x].green = image[y][x].blue = gradient_magnitude[y][x];
+        }
+    }
+}
+
+// Implement the helper functions for canny edge detecting here
+
+std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>> Image::sobelOperator() {
+    std::vector<std::vector<double>> gradient_x(image.size(), std::vector<double>(image[0].size(), 0));
+    std::vector<std::vector<double>> gradient_y(image.size(), std::vector<double>(image[0].size(), 0));
+
+    const int sobel_x[3][3] = { {-1, 0, 1},
+                                {-2, 0, 2},
+                                {-1, 0, 1} };
+
+    const int sobel_y[3][3] = { {-1, -2, -1},
+                                {0,  0,  0},
+                                {1,  2,  1} };
+
+    for (int y = 1; y < image.size() - 1; y++) {
+        for (int x = 1; x < image[y].size() - 1; x++) {
+            int gx = 0, gy = 0;
+
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    int pixel_value = image[y + i][x + j].getPixel()[0]; // Assuming grayscale image
+                    gx += pixel_value * sobel_x[i + 1][j + 1];
+                    gy += pixel_value * sobel_y[i + 1][j + 1];
+                }
+            }
+
+            gradient_x[y][x] = gx;
+            gradient_y[y][x] = gy;
+        }
+    }
+
+    return {gradient_x, gradient_y};
+}
